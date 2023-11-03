@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap');
+
+::-webkit-scrollbar{
+  display: none;
+}
+body{
+  background-image: url("https://images.unsplash.com/photo-1498354136128-58f790194fa7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: 'Noto Sans', sans-serif;
+}
