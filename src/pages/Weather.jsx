@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WeatherBox from '../components/WeatherBox';
+import Loader from '../components/Loader';
 
 function Weather() {
   const apiKey = import.meta.env.VITE_API_KEY;
@@ -12,7 +13,8 @@ function Weather() {
     setCity(event.target.value);
   };
 
-  const handleButtonClick = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
     fetchWeatherData(city);
   };
 
@@ -35,13 +37,18 @@ function Weather() {
     fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('City not found');
+        }
+        return response.json();
+      })
       .then((data) => {
         setWeather(data);
         setLoading(false);
       })
       .catch((err) => {
-        setError('Error fetching weather data');
+        setError(err.message);
         setLoading(false);
         console.error(err);
       });
@@ -77,54 +84,54 @@ function Weather() {
       value: weather ? weather.wind.speed : 'N/A',
     },
   ];
-
+ if(loading){
+  return <Loader/>
+ }
   return (
-    <section className="py-24">
-      <div className="w-full max-w-xs mx-auto flex flex-col justify-center items-center mt-4">
-        <div className="w-full">
-          <div className="flex items-center border-b border-teal-500 py-2">
-            <input
-              className="appearance-none bg-transparent border-none w-full mr-3 py-1 px-2 leading-tight focus:outline-none"
-              type="text"
-              placeholder="Enter city name"
-              value={city}
-              onChange={handleInputChange}
-            />
-            <button
-              className="flex-shrink-0 bg-blue-500 hover:bg-blue-700 border-blue-500 hover:border-blue-700 text-sm border-4 text-white py-1 px-2 rounded outline-none"
-              type="submit"
-              onClick={handleButtonClick}
-            >
-              Get Weather
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="mt-4">
-        {loading ? (
-          <p className='text-center text-3xl my-10'>Loading...</p>
-        ) : error ? (
-          <p className='text-center text-3xl my-10'>{error}</p>
-        ) : weather && (
-          <div className="text-gray-600 body-font">
-            <div className="container px-5 py-12 mx-auto">
-              <h2 className="text-3xl font-semibold mb-10 text-center">
-                Weather in {weather.name}
-              </h2>
-              <div className="flex flex-wrap -m-4 text-center">
-                {data.map((box) => (
-                  <WeatherBox
-                    key={box.id}
-                    title={box.title}
-                    value={box.value}
-                    unit={box.unit}
-                    icon={box.icon}
-                  />
-                ))}
+    <section className="min-h-screen flex flex-col justify-center py-12">
+      <div className="container mx-auto px-5">
+        <form className="flex items-center border-b border-gray-800 py-2 md:w-1/2 w-full mx-auto" onSubmit={handleSubmit}>
+          <input
+            className=" bg-transparent border-none w-full mr-3 py-1 px-2  outline-none"
+            type="text"
+            placeholder="Enter city name"
+            value={city}
+            onChange={handleInputChange}
+          />
+          <button
+            className="flex-shrink-0 bg-blue-500 hover:bg-blue-700 border-blue-500 hover:border-blue-700 text-sm border-4 text-white py-1 px-2 rounded outline-none"
+            type="submit"
+            
+          >
+            Get Weather
+          </button>
+        </form>
+
+        <div className="mt-4">
+         {
+          error ? (
+            <p className="text-center text-3xl my-10">{error}</p>
+          ) : weather && (
+            <div>
+              <div className="container py-12 mx-auto">
+                <h2 className="text-3xl font-semibold mb-10 text-center">
+                  Weather in {weather.name}
+                </h2>
+                <div className="flex flex-wrap -m-4 text-center">
+                  {data.map((box) => (
+                    <WeatherBox
+                      key={box.id}
+                      title={box.title}
+                      value={box.value}
+                      unit={box.unit}
+                      icon={box.icon}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );
